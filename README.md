@@ -27,6 +27,52 @@ A lightweight PyTorch model for document corner detection using **direct coordin
 | **Model Size (INT8)** | 1.12 MB |
 | **Compression** | 3.4× |
 
+## Pretrained Models
+
+Two pretrained models are included in the `checkpoints/` directory:
+
+| Model | File | Input Size | Mean IoU | Corner Error | Size |
+|-------|------|------------|----------|--------------|------|
+| **best_320** | `checkpoints/best_320.pth` | 320×320 | 96.11% | 1.45 px | 12 MB |
+| best_224 | `checkpoints/best_224.pth` | 224×224 | 95.82% | 1.61 px | 12 MB |
+
+### Quick Start with Pretrained Models
+
+```python
+import torch
+from model import create_model
+
+# Load the 320x320 model (best performance)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+checkpoint = torch.load("checkpoints/best_320.pth", map_location=device)
+config = checkpoint["config"]
+
+model = create_model(
+    img_size=config["img_size"],
+    coord_activation=config["coord_activation"],  # "clamp"
+    pretrained=False,
+)
+model.load_state_dict(checkpoint["model_state_dict"])
+model.to(device)
+model.eval()
+
+# Inference
+with torch.no_grad():
+    coords, score = model(image_tensor)  # image_tensor: [B, 3, 320, 320]
+
+# coords: [B, 8] normalized [0, 1] - corner coordinates
+# score: [B] logit - apply sigmoid for probability
+```
+
+### Training Configuration
+
+Both models were trained with:
+- **Activation**: `clamp` (allows true [0, 1] coordinates)
+- **Loss**: Wing Loss + Geometry Loss
+- **Augmentation**: `strong` preset
+- **Scheduler**: Cosine annealing with warmup
+- **Early stopping**: Based on IoU metric
+
 ## Dataset
 
 This model is trained on the **DocCornerDataset** available on HuggingFace:
@@ -220,6 +266,9 @@ onnx2tf -i model.onnx -o saved_model
 ## Files
 
 ```
+├── checkpoints/
+│   ├── best_320.pth      # Pretrained model (320×320 input)
+│   └── best_224.pth      # Pretrained model (224×224 input)
 ├── model.py              # MobileNetV3-Small + regression head
 ├── dataset.py            # PyTorch Dataset with augmentations
 ├── metrics.py            # IoU, corner error, recall metrics

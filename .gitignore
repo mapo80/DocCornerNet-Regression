@@ -1,6 +1,5 @@
-# Checkpoints & Models
-checkpoints/
-*.pth
+# Checkpoints & Models (allow best_*.pth)
+!checkpoints/best_*.pth
 *.pth.zip
 *.onnx
 *.tflite
