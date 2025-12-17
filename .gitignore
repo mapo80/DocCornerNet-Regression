@@ -1,0 +1,41 @@
+# Checkpoints & Models
+checkpoints/
+*.pth
+*.pth.zip
+*.onnx
+*.tflite
+*.pb
+saved_model/
+
+# Cache
+cache/
+*.pkl
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+training.log
+nohup.out
+
+# Temp
+*.tmp
+*.bak
